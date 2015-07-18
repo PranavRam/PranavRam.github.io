@@ -1,0 +1,57 @@
+doctype html
+html lang="en"
+  head
+    meta charset="utf-8"
+    / meta http-equiv="X-UA-Compatible" content="IE=edge"
+    / Use title if it's in the page YAML frontmatter
+    title =("Sublime Code - Blog - #{current_article.title}")
+    / meta name="description" content=""
+    meta name="viewport" content="width=device-width, initial-scale=1"
+
+    = stylesheet_link_tag "main", type: false
+    link href='/css/clean-blog.min.css' rel='stylesheet' type='text/css'
+    link href='/css/syntax.css' rel='stylesheet' type='text/css'
+    link href='/css/rouge-syntax.css' rel='stylesheet' type='text/css'
+    link href='/font-awesome/css/font-awesome.min.css' rel='stylesheet' type='text/css'
+    link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'
+    link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'
+  body
+  	/! Navigation
+  	nav.navbar.navbar-default.navbar-custom.navbar-fixed-top
+  	  .container-fluid
+  	    /! Brand and toggle get grouped for better mobile display
+  	    .navbar-header.page-scroll
+  	      button.navbar-toggle data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" type="button" 
+  	        span.sr-only Toggle navigation
+  	        span.icon-bar
+  	        span.icon-bar
+  	        span.icon-bar
+  	      a.navbar-brand href="/" Sublime Code
+  	    /! Collect the nav links, forms, and other content for toggling
+  	    #bs-example-navbar-collapse-1.collapse.navbar-collapse
+  	      ul.nav.navbar-nav.navbar-right
+  	        li
+  	          a href="/"  Home
+  	        li
+  	          a href="/#about" About
+            li
+              a href="/blog" Blog
+  	    /! /.navbar-collapse
+  	  /! /.container
+  	/! Page Header
+  	header.intro-header(style="background-image: url('#{current_article.data.background}')")
+  	  .container
+  	    .row
+  	      .col-lg-8.col-lg-offset-2.col-md-10.col-md-offset-1
+  	        .site-heading
+  	          h1  = current_article.title
+  	          hr.small/
+              span.subheading  =current_article.tags.join(", ")
+                
+  	.container
+  	  .row
+  	    .col-lg-8.col-lg-offset-2.col-md-10.col-md-offset-1
+  	    	=yield
+		
+		= javascript_include_tag "main", type: false
+		= javascript_include_tag "clean-blog.min", type: false
