@@ -93,7 +93,7 @@ Great! Let's see if this actually works - write the following code after our Evi
 ~~~javascript
 var eb = EvidenceBox();
 
-var container = d3.select('#chart');
+var container = d3.select('#canvas');
 container
   .append('div')
   .attr('class', 'evidence')
@@ -114,7 +114,8 @@ function EvidenceBox(){
       height       = 250,
       // default height of the header
       headerHeight = 50,
-      headerColor = '#4A90E2'
+      headerColor = '#4A90E2',
+      entityColor = '#F5A623';
 
   function component(selection){
     selection.each(function(d, i){
@@ -222,3 +223,224 @@ headerText
 ~~~
 
 <img src="/img/blog/ui-components-with-d3js/box-header-text.png">
+
+This component is already looking good. Let's add some of our entities to the body of the evidences.
+
+~~~javascript
+.
+.
+
+headerText
+  .style({
+    'line-height': headerHeight+'px',
+    color: 'white'
+  })
+  .text(function(d){ return d.title });
+
+var body = box
+            .selectAll('.body')
+            .data(data);
+
+body
+  .enter()
+  .append('div')
+  .attr('class', 'body');
+
+var entities = body
+                .selectAll('.entity')
+                .data(d.entities);
+
+entities
+  .enter()
+  .append('div')
+  .attr('class', 'entity');       
+
+entities
+  .style('margin', '15px');
+
+entities.each(function(entityData){
+  var entityText = d3.select(this)
+                    .selectAll('.entity-text')
+                    .data([entityData]);
+  entityText
+    .enter()
+    .append('span')
+    .attr('class', 'entity-text');
+
+  entityText
+    .style({
+      'background-color': entityColor,
+      'padding': '5px'
+    })
+    .text(function(d) { return d; });
+});
+~~~
+
+<img src="/img/blog/ui-components-with-d3js/entities.png">
+
+Now that we have our entities, we're going to show the count in the header.
+
+~~~javascript
+.
+.
+headerText
+  .style({
+    'line-height': headerHeight+'px',
+    color: 'white'
+  })
+  .text(function(d){ return d.title });
+
+var entityCount = header
+                    .selectAll('.entity-count')
+                    .data([d]);
+
+entityCount
+  .enter()
+  .append('div')
+  .attr('class', 'entity-count');
+
+entityCount
+  .style({
+    display: 'inline-block',
+    'background-color': '#4A4A4A',
+    color: 'white',
+    float: 'right',
+    margin: '10px 10px',
+    'line-height': '24px',
+    width: headerHeight/2 + 'px',
+    'text-align': 'center'
+  })
+  .text(function(d){ return d.entities.length; });
+~~~
+
+<img src="/img/blog/ui-components-with-d3js/entity-count.png">
+
+Hang in there! We're almost done! We're going to add the open/close functionality and we'd have a pretty useful component!
+
+Let's start by including the font-awesome collection:
+
+In your index.html file, include the font-awesome css file.
+
+```<link href="/font-awesome/css/font-awesome.min.css" rel'stylesheet' type="text/css'```
+
+Add the follwing code above the previous listing. We do this because we're using the 'float: right;' property on both elements and we want the open/close icon to be at the right most part of the header. If we instead wrote it after the previous listing, we'd have the element on the left of the entity count.
+
+~~~javascript
+var openClose = header
+                    .selectAll('.open-close')
+                    .data([d]);
+
+openClose
+  .enter()
+  .append('i')
+  .classed({
+    'open-close': true,
+    'fa': true
+  })
+  .attr('data-is-open', 'true');
+
+
+openClose
+  .style({
+    float: 'right',
+    margin: '10px 10px',
+  })
+  .classed('fa-minus', function(d){
+    var isOpen = d3.select(this).attr('data-is-open');
+    if(isOpen === 'true'){ return true; }
+    return false;
+  })
+  .classed('fa-plus', function(d){
+    var isOpen = d3.select(this).attr('data-is-open');
+    if(isOpen === 'true'){ return false; }
+    return true;
+  });
+~~~
+
+Note in the above listing, we're adding a data-is-open custom attribute and setting it to the default value of true. We'll use this attribute to show/hide the body. Your evidence box should look like the following listing:
+
+<img src="/img/blog/ui-components-with-d3js/open-close-button.png">
+
+I hope you can see the light at the end of the tunnel. We're going to add open/close functionality.
+
+Add the following to the openClose variable above
+
+~~~javascript
+openClose
+    .style({
+      float: 'right',
+      margin: '10px 10px',
+    })
+    .classed('fa-minus', function(d){
+      var isOpen = d3.select(this).attr('data-is-open');
+      if(isOpen === 'true'){ return true; }
+      return false;
+    })
+    .classed('fa-plus', function(d){
+      var isOpen = d3.select(this).attr('data-is-open');
+      if(isOpen === 'true'){ return false; }
+      return true;
+    })
+    .on('click', function(d){
+      var self = d3.select(this);
+      var isOpen = self.attr('data-is-open');
+      if(isOpen === 'true'){ 
+        self.attr('data-is-open', 'false');
+        self.attr('class', 'open-close fa fa-plus');
+        body.style('display', 'none');
+      }
+      else {
+        self.attr('data-is-open', 'true')
+        self.attr('class', 'open-close fa fa-minus');
+        body.style('display', '');
+      }
+    });
+~~~
+
+We also need to remove the 'height' property from the 'box' object to ensure that the body collapses.
+
+~~~javascript
+// setup box size
+box.style({
+  width: width+'px',
+});
+
+// setup the outline
+box.style('border', '2px solid black');
+~~~
+
+And you're done! Good job getting this far! Clicking on the open/close button should show/hide the div like this:
+
+<img style="display: inline-block;" src="/img/blog/ui-components-with-d3js/open-box.png">
+<img style="display: inline-block;" src="/img/blog/ui-components-with-d3js/close-box.png">
+
+Change the container code to do the following. It's going to update the component with the new data!
+
+~~~javascript
+var evidences = container
+                  .selectAll('.evidence')
+                  .data(data);
+evidences 
+  .enter()
+  .append('div')
+  .attr('class', 'evidence')
+  .call(eb);
+
+
+setTimeout(function(){
+  data[0] = {
+    title: 'Evidence Changed',
+    entities: [
+      'Casino',
+      'Loaded Dice',
+      'Blackjack'
+    ]
+  };
+
+  evidences.data(data).call(eb);
+}, 2000);
+~~~
+
+d3js is a powerful tool for creating resuable components, not just data visualizations and I hope that this introduction will have you using it in your own work!
+
+Until next time...

@@ -1,7 +1,14 @@
 ---
 layout: blog
-description: "A Clean Blog Theme by Start Bootstrap"
+description: "Sublime Code - Blog"
 ---
 
 - blog.articles.each do |article|
-	h1 =article.url
+	div.post-preview
+		a href="#{article.url}"
+			h2.post-title =article.title
+			h3.post-subtitle =article.tags.join(', ')
+		p.post-meta 
+			| Posted by 
+			a href="#" Pranav Ram 
+			| on #{ActiveSupport::TimeZone.new('UTC').parse(article.date.to_s).strftime("%B %d, %Y")}
